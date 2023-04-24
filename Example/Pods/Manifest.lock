@@ -1,27 +1,18 @@
 PODS:
-  - Nimble (10.0.0)
   - ObjectOnDisk (0.1.0)
-  - Quick (2.2.1)
+  - ObjectOnDisk/Tests (0.1.0)
 
 DEPENDENCIES:
-  - Nimble (~> 10.0.0)
   - ObjectOnDisk (from `../`)
-  - Quick (~> 2.2.0)
-
-SPEC REPOS:
-  trunk:
-    - Nimble
-    - Quick
+  - ObjectOnDisk/Tests (from `../`)
 
 EXTERNAL SOURCES:
   ObjectOnDisk:
     :path: "../"
 
 SPEC CHECKSUMS:
-  Nimble: 5316ef81a170ce87baf72dd961f22f89a602ff84
-  ObjectOnDisk: 37b89d06dfe845052a10f9574eb167c1e21a1ebf
-  Quick: f5754d69b7013f5864c29aab9ae6f0c79c5bc200
+  ObjectOnDisk: 20e47e6538b54fc2a3567b7196e4f2a0c7de00b9
 
-PODFILE CHECKSUM: 875fae2333418f062a1eee1faccc7d10cd38f284
+PODFILE CHECKSUM: e4462c179507d3a6e349fa7028e264e34562b162
 
 COCOAPODS: 1.12.1

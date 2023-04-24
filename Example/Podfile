@@ -3,12 +3,9 @@ use_frameworks!
 platform :ios, '10.0'
 
 target 'ObjectOnDisk_Example' do
-  pod 'ObjectOnDisk', :path => '../'
+  pod 'ObjectOnDisk', :path => '../', :testspecs => ['Tests']
 
   target 'ObjectOnDisk_Tests' do
     inherit! :search_paths
-
-    pod 'Quick', '~> 2.2.0'
-    pod 'Nimble', '~> 10.0.0'
   end
 end
