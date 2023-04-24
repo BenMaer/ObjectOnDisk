@@ -1,0 +1,22 @@
+{
+  "name": "ObjectOnDisk",
+  "version": "0.1.0",
+  "summary": "A short description of ObjectOnDisk.",
+  "description": "TODO: Add long description of the pod here.",
+  "homepage": "https://github.com/Ben Maer/ObjectOnDisk",
+  "license": {
+    "type": "MIT",
+    "file": "LICENSE"
+  },
+  "authors": {
+    "Ben Maer": "ben@resplendent.co"
+  },
+  "source": {
+    "git": "https://github.com/Ben Maer/ObjectOnDisk.git",
+    "tag": "0.1.0"
+  },
+  "platforms": {
+    "ios": "10.0"
+  },
+  "source_files": "ObjectOnDisk/Classes/**/*"
+}

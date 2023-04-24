@@ -1,0 +1,6 @@
+framework module Pods_ObjectOnDisk_Example {
+  umbrella header "Pods-ObjectOnDisk_Example-umbrella.h"
+
+  export *
+  module * { export * }
+}

@@ -1,0 +1,6 @@
+framework module ObjectOnDisk {
+  umbrella header "ObjectOnDisk-umbrella.h"
+
+  export *
+  module * { export * }
+}
