@@ -12,7 +12,6 @@ import RxRelay
 import RxRelay_PropertyWrappers
 import RxSwift
 
-// TODO: Refactor most of `UserNeighborhoodManager`'s tests to instead test saving/loading on this class, and let the manager run tests through this class's tests in some way.
 public final class ObjectOnDisk<Wrapped: Codable & Equatable> {
     @PublishRelayObserverProperty public var updateObject: AnyObserver<Wrapped?>
     @PublishRelayObservableProperty public var didFinishDiskSave: Observable<DidFinishDiskSaveResult>

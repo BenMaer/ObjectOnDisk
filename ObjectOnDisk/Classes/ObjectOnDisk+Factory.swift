@@ -34,7 +34,7 @@ public extension ObjectOnDiskFactory {
 }
 
 public extension ObjectOnDiskFactory.DEBUGProperties {
-    public enum LoadFromDiskForcedAction {
+    enum LoadFromDiskForcedAction {
         case ignore, remove
     }
 }
