@@ -18,15 +18,21 @@ public final class ObjectOnDisk<Wrapped: Codable & Equatable> {
     @PublishRelayObservableProperty var didFinishDiskSave: Observable<DidFinishDiskSaveResult>
     @OptionalBehaviorRelayObservableProperty var object: Observable<Wrapped?>
     
-    init(diskInfo: DiskInfo, decoder: JSONDecoder = .init()) {
+    init(
+        diskInfo: DiskInfo,
+        decoder: JSONDecoder = configuration.createJSONDecoder(),
+        encoder: JSONEncoder = configuration.createJSONEncoder()
+    ) {
         self.diskInfo = diskInfo
         self.decoder = decoder
+        self.encoder = encoder
         
         setupObservations()
     }
     
     private let diskInfo: DiskInfo
     private let decoder: JSONDecoder
+    private let encoder: JSONEncoder
     private let loadFromDiskState: BehaviorRelay<LoadFromDiskState> = .init(value: .none)
     private let disposeBag = DisposeBag()
     
@@ -136,7 +142,7 @@ private extension ObjectOnDisk {
         }
         
         do {
-            try diskInfo.saveInBackground(object, completion: { [weak self] success in
+            try diskInfo.saveInBackground(object, encoder: encoder, completion: { [weak self] success in
                 assert(success, "Failed to load a objects from disk")
 #if DEBUG
                 self?.checkIsSavedToDisk(object)

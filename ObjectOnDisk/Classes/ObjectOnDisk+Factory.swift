@@ -10,7 +10,7 @@ import Foundation
 public struct ObjectOnDiskFactory {
     let diskInfo: DiskInfo
     let decoder: JSONDecoder
-    init(diskInfo: DiskInfo, decoder: JSONDecoder = ObjectOnDiskConfiguration.shared.jsonDecoderConstructor()) {
+    init(diskInfo: DiskInfo, decoder: JSONDecoder = ObjectOnDiskConfiguration.shared.createJSONDecoder()) {
         self.diskInfo = diskInfo
         self.decoder = decoder
     }
