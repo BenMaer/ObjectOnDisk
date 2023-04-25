@@ -15,7 +15,7 @@ public final class ObjectOnDiskConfiguration {
 public extension ObjectOnDiskConfiguration {
     typealias JSONDecoderConstructor = () -> JSONDecoder
     typealias JSONEncoderConstructor = () -> JSONEncoder
-
+    
     static let shared = ObjectOnDiskConfiguration()
     
     func createJSONDecoder() -> JSONDecoder { jsonDecoderConstructor() }

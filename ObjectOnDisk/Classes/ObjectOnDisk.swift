@@ -44,7 +44,7 @@ public final class ObjectOnDisk<Wrapped: Codable & Equatable> {
 public extension ObjectOnDisk {
     typealias DidFinishDiskSaveResult = Result<Wrapped?,Error>
     typealias Configuration = ObjectOnDiskConfiguration
-        
+    
     static var configuration: Configuration { .shared }
     var configuration: Configuration { Self.configuration }
     
