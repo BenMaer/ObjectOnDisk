@@ -1,0 +1,6 @@
+framework module RxRelay_PropertyWrappers {
+  umbrella header "RxRelay-PropertyWrappers-umbrella.h"
+
+  export *
+  module * { export * }
+}

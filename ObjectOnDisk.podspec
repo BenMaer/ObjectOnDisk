@@ -25,11 +25,11 @@ Pod::Spec.new do |s|
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'Ben Maer' => 'ben@resplendent.co' }
-  s.source           = { :git => 'https://github.com/BenMaer/ObjectOnDisk.git', :tag => s.version.to_s }
+  s.source           = { :git => 'https://github.com/BenMaer/ObjectOnDisk.git', :tag => "v#{s.version}" }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
     
-  s.swift_version = '4.0'
   s.ios.deployment_target = '10.0'
+  s.swift_version = '4.0'
 
   s.source_files = 'ObjectOnDisk/Classes/**/*'
   
@@ -43,5 +43,8 @@ Pod::Spec.new do |s|
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
   # s.frameworks = 'UIKit', 'MapKit'
-  # s.dependency 'AFNetworking', '~> 2.3'
+  s.dependency 'Disk', '~> 0.6'
+  s.dependency 'RxCocoa', '~> 6.5'
+  s.dependency 'RxRelay-PropertyWrappers', '~> 0.1.1'
+  s.dependency 'RxRelay', '~> 6.5'
 end

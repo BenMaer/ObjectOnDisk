@@ -13,7 +13,7 @@
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
 		648C2384379644A1F25AFACE /* Pods_ObjectOnDisk_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50974D6F7C10D96BA5637155 /* Pods_ObjectOnDisk_Tests.framework */; };
-		D7D0C06229F72C68008AA772 /* ObjectOnDisk.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7D0C06129F72C68008AA772 /* ObjectOnDisk.swift */; };
+		D7C8E34529F84E0C004F888E /* ObjectOnDisk-Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7C8E34429F84E0C004F888E /* ObjectOnDisk-Tests.swift */; };
 		E8F4BBD9F327E4A1DF721325 /* Pods_ObjectOnDisk_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B8C2BD2F318F864B7ECAC449 /* Pods_ObjectOnDisk_Example.framework */; };
 /* End PBXBuildFile section */
 
@@ -46,7 +46,7 @@
 		895DB11F1D5ED586D737F654 /* Pods-ObjectOnDisk_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ObjectOnDisk_Tests.release.xcconfig"; path = "Target Support Files/Pods-ObjectOnDisk_Tests/Pods-ObjectOnDisk_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		9D5CCD0DD9B7E29B3B8F66F7 /* Pods-ObjectOnDisk_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ObjectOnDisk_Example.debug.xcconfig"; path = "Target Support Files/Pods-ObjectOnDisk_Example/Pods-ObjectOnDisk_Example.debug.xcconfig"; sourceTree = "<group>"; };
 		B8C2BD2F318F864B7ECAC449 /* Pods_ObjectOnDisk_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ObjectOnDisk_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		D7D0C06129F72C68008AA772 /* ObjectOnDisk.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectOnDisk.swift; sourceTree = "<group>"; };
+		D7C8E34429F84E0C004F888E /* ObjectOnDisk-Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ObjectOnDisk-Tests.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -126,7 +126,7 @@
 		607FACE81AFB9204008FA782 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
-				D7D0C06129F72C68008AA772 /* ObjectOnDisk.swift */,
+				D7C8E34429F84E0C004F888E /* ObjectOnDisk-Tests.swift */,
 				607FACE91AFB9204008FA782 /* Supporting Files */,
 			);
 			path = Tests;
@@ -313,11 +313,21 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-ObjectOnDisk_Example/Pods-ObjectOnDisk_Example-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/Disk/Disk.framework",
 				"${BUILT_PRODUCTS_DIR}/ObjectOnDisk/ObjectOnDisk.framework",
+				"${BUILT_PRODUCTS_DIR}/RxCocoa/RxCocoa.framework",
+				"${BUILT_PRODUCTS_DIR}/RxRelay/RxRelay.framework",
+				"${BUILT_PRODUCTS_DIR}/RxRelay-PropertyWrappers/RxRelay_PropertyWrappers.framework",
+				"${BUILT_PRODUCTS_DIR}/RxSwift/RxSwift.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Disk.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ObjectOnDisk.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxCocoa.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxRelay.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxRelay_PropertyWrappers.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxSwift.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -340,7 +350,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D7D0C06229F72C68008AA772 /* ObjectOnDisk.swift in Sources */,
+				D7C8E34529F84E0C004F888E /* ObjectOnDisk-Tests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

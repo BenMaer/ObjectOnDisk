@@ -3,8 +3,8 @@ use_frameworks!
 platform :ios, '10.0'
 
 target 'ObjectOnDisk_Example' do
-  pod 'ObjectOnDisk', :path => '../', :testspecs => ['Tests']
-
+  pod 'ObjectOnDisk', :path => '../'
+  
   target 'ObjectOnDisk_Tests' do
     inherit! :search_paths
   end
