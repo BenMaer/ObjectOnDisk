@@ -12,7 +12,7 @@ import RxRelay
 import RxRelay_PropertyWrappers
 import RxSwift
 
-public final class ObjectOnDisk<Wrapped: Codable & Equatable> {
+public final class ObjectOnDisk<Wrapped: ObjectOnDiskWrappedRequirements> {
     @PublishRelayObserverProperty public var updateObject: AnyObserver<Wrapped?>
     @PublishRelayObservableProperty public var didFinishDiskSave: Observable<DidFinishDiskSaveResult>
     @OptionalBehaviorRelayObservableProperty public var object: Observable<Wrapped?>
@@ -39,6 +39,8 @@ public final class ObjectOnDisk<Wrapped: Codable & Equatable> {
     private var debugProperties: Factory.DEBUGProperties = .init()
 #endif
 }
+
+public typealias ObjectOnDiskWrappedRequirements = Codable & Equatable
 
 public extension ObjectOnDisk {
     typealias DidFinishDiskSaveResult = Result<Wrapped?,Error>
