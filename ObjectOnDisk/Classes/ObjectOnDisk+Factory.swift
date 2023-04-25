@@ -10,25 +10,33 @@ import Foundation
 public struct ObjectOnDiskFactory {
     let diskInfo: DiskInfo
     let decoder: JSONDecoder
-    init(diskInfo: DiskInfo, decoder: JSONDecoder = ObjectOnDiskConfiguration.shared.createJSONDecoder()) {
+    public init(diskInfo: DiskInfo, decoder: JSONDecoder = ObjectOnDiskConfiguration.shared.createJSONDecoder()) {
         self.diskInfo = diskInfo
         self.decoder = decoder
     }
     
 #if DEBUG
-    var debugProperties: DEBUGProperties = .init()
+    public var debugProperties: DEBUGProperties = .init()
 #endif
 }
 
-public extension ObjectOnDiskFactory {
 #if DEBUG
+public extension ObjectOnDiskFactory {
     struct DEBUGProperties {
-        var didFailToLoadFromDisk_assert = false
+        public var didFailToLoadFromDisk_assert = false
+        public var loadFromDiskForcedAction: LoadFromDiskForcedAction? = nil
         
-        enum LoadFromDiskForcedAction {
-            case ignore, remove
+        public init(didFailToLoadFromDisk_assert: Bool = false, loadFromDiskForcedAction: LoadFromDiskForcedAction? = nil) {
+            self.didFailToLoadFromDisk_assert = didFailToLoadFromDisk_assert
+            self.loadFromDiskForcedAction = loadFromDiskForcedAction
         }
-        var loadFromDiskForcedAction: LoadFromDiskForcedAction? = nil
     }
-#endif
 }
+
+public extension ObjectOnDiskFactory.DEBUGProperties {
+    public enum LoadFromDiskForcedAction {
+        case ignore, remove
+    }
+}
+
+#endif

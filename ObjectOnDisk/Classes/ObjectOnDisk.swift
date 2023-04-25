@@ -14,11 +14,11 @@ import RxSwift
 
 // TODO: Refactor most of `UserNeighborhoodManager`'s tests to instead test saving/loading on this class, and let the manager run tests through this class's tests in some way.
 public final class ObjectOnDisk<Wrapped: Codable & Equatable> {
-    @PublishRelayObserverProperty var updateObject: AnyObserver<Wrapped?>
-    @PublishRelayObservableProperty var didFinishDiskSave: Observable<DidFinishDiskSaveResult>
-    @OptionalBehaviorRelayObservableProperty var object: Observable<Wrapped?>
+    @PublishRelayObserverProperty public var updateObject: AnyObserver<Wrapped?>
+    @PublishRelayObservableProperty public var didFinishDiskSave: Observable<DidFinishDiskSaveResult>
+    @OptionalBehaviorRelayObservableProperty public var object: Observable<Wrapped?>
     
-    init(
+    public init(
         diskInfo: DiskInfo,
         decoder: JSONDecoder = configuration.createJSONDecoder(),
         encoder: JSONEncoder = configuration.createJSONEncoder()

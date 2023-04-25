@@ -10,6 +10,17 @@ import Foundation
 import Disk
 
 public struct DiskInfo {
-    var directory: Disk.Directory = .applicationSupport
+    var directory: Directory = directory
     let path: String
+    
+    public init(directory: Directory = directory, path: String) {
+        self.directory = directory
+        self.path = path
+    }
+}
+
+public extension DiskInfo {
+    typealias Directory = Disk.Directory
+    
+    static var directory: Directory = .applicationSupport
 }
