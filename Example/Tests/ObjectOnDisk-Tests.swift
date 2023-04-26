@@ -52,7 +52,19 @@ private extension ObjectOnDisk_Tests {
         static func == (lhs: TestClass, rhs: TestClass) -> Bool { lhs.int == rhs.int}
     }
     
-    func createObjectOnDisk<T: ObjectOnDiskWrappedRequirements>(_ completion: @escaping (ObjectOnDisk<T>) -> Void) {
+    func testSaveThenLoadThenDelete<T: ObjectOnDiskWrappedRequirements>(objects: [T], file: StaticString = #filePath, line: UInt = #line) {
+        let objectOnDiskExpectation = XCTestExpectation(description: "ObjectOnDisk should finished creating.")
+        let finishedStepsExpectation = XCTestExpectation(description: "Should finished steps.")
+        Self.createObjectOnDisk { objectOnDisk in
+            objectOnDiskExpectation.fulfill()
+            Self.testSaveThenLoadThenDelete(objectOnDisk: objectOnDisk, objects: objects, completion: {
+                finishedStepsExpectation.fulfill()
+            }, file: file, line: line)
+        }
+        wait(for: [objectOnDiskExpectation, finishedStepsExpectation], timeout: 0.1)
+    }
+    
+    static func createObjectOnDisk<T: ObjectOnDiskWrappedRequirements>(_ completion: @escaping (ObjectOnDisk<T>) -> Void) {
         let diskInfo = DiskInfo(path: "unit-test-path")
         try? diskInfo.remove()
         
@@ -61,20 +73,8 @@ private extension ObjectOnDisk_Tests {
         
     }
     
-    func testSaveThenLoadThenDelete<T: ObjectOnDiskWrappedRequirements>(objects: [T], file: StaticString = #filePath, line: UInt = #line) {
-        let objectOnDiskExpectation = XCTestExpectation(description: "ObjectOnDisk should finished creating.")
-        let finishedStepsExpectation = XCTestExpectation(description: "Should finished steps.")
-        createObjectOnDisk { [weak self] objectOnDisk in
-            objectOnDiskExpectation.fulfill()
-            self?.testSaveThenLoadThenDelete(objectOnDisk: objectOnDisk, steps: Array(Self.steps(for: objects).reversed()), completion: {
-                finishedStepsExpectation.fulfill()
-            }, file: file, line: line)
-        }
-        wait(for: [objectOnDiskExpectation, finishedStepsExpectation], timeout: 0.1)
-    }
-    
-    func testSaveThenLoadThenDelete<T: ObjectOnDiskWrappedRequirements>(objectOnDisk: ObjectOnDisk<T>, steps: [Step<T>], completion: @escaping () -> Void, file: StaticString = #filePath, line: UInt = #line) {
-        var steps = steps
+    static func testSaveThenLoadThenDelete<T: ObjectOnDiskWrappedRequirements>(objectOnDisk: ObjectOnDisk<T>, objects: [T], completion: @escaping () -> Void, file: StaticString = #filePath, line: UInt = #line) {
+        var steps = Array(Self.steps(for: objects).reversed())
         
         let objectDidChange: (T?) -> Void = { obj in
             guard let nextStep = steps.popLast() else {
@@ -98,8 +98,7 @@ private extension ObjectOnDisk_Tests {
             .disposed(by: disposeBagPointer ?? disposeBag)
         
         update(
-            objectOnDisk: objectOnDisk,
-            nextObject: {
+            objectOnDisk: objectOnDisk, nextObject: {
                 guard let nextStep = steps.popLast() else {
                     return nil
                 }
@@ -110,29 +109,45 @@ private extension ObjectOnDisk_Tests {
                 }
                 
                 return obj
-            },
-            completion: {
+            }, completion: {
                 disposeBagPointer = nil
                 completion()
-            }
+            },
+            file: file, line: line
         )
     }
     
-    func update<T: ObjectOnDiskWrappedRequirements>(objectOnDisk: ObjectOnDisk<T>, nextObject: @escaping () -> (T??), completion: @escaping () -> Void) {
+    static func update<T: ObjectOnDiskWrappedRequirements>(objectOnDisk: ObjectOnDisk<T>, nextObject: @escaping () -> (T??), completion: @escaping () -> Void, file: StaticString = #filePath, line: UInt = #line) {
         guard let obj = nextObject() else {
             completion()
             return
         }
         
-        objectOnDisk.update(object: obj) { [weak self] success in
-            guard let base = self else {
-                assertionFailure("test died before it finished.")
+        objectOnDisk.update(object: obj) { success in
+            guard success else {
+                XCTAssert(false, "failed to save object: \(String(describing: obj)): to disk info: \(objectOnDisk.diskInfo)", file: file, line: line)
                 completion()
                 return
             }
             
-            base.update(objectOnDisk: objectOnDisk, nextObject: nextObject, completion: completion)
+            checkObjectIsSavedToDisk(obj, diskInfo: objectOnDisk.diskInfo, file: file, line: line)
+            
+            update(objectOnDisk: objectOnDisk, nextObject: nextObject, completion: completion, file: file, line: line)
         }
+    }
+    
+    static func checkObjectIsSavedToDisk<T: ObjectOnDiskWrappedRequirements>(_ object: T?, diskInfo: DiskInfo, file: StaticString = #filePath, line: UInt = #line) {
+        guard diskInfo.existsOnDisk else {
+            XCTAssert(object == nil, "object was saved to disk, but no file was found", file: file, line: line)
+            return
+        }
+        
+        guard let savedObject = try? diskInfo.retrieve(as: T.self) else {
+            XCTAssert(false, "should have had saved object at disk info: \(diskInfo)", file: file, line: line)
+            return
+        }
+        
+        XCTAssert(savedObject == object, "saved object: \(String(describing: savedObject))\nshould equal object: \(String(describing: object))", file: file, line: line)
     }
     
     static func steps<T: ObjectOnDiskWrappedRequirements>(for objects: [T]) -> [Step<T>] {

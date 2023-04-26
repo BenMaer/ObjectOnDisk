@@ -13,6 +13,7 @@ import RxRelay_PropertyWrappers
 import RxSwift
 
 public final class ObjectOnDisk<Wrapped: ObjectOnDiskWrappedRequirements> {
+    let diskInfo: DiskInfo
     @PublishRelayObservableProperty public var didFinishDiskSave: Observable<DidFinishDiskSaveResult>
     @OptionalBehaviorRelayObservableProperty public var object: Observable<Wrapped?>
     
@@ -26,7 +27,6 @@ public final class ObjectOnDisk<Wrapped: ObjectOnDiskWrappedRequirements> {
         self.encoder = encoder
     }
     
-    private let diskInfo: DiskInfo
     private let decoder: JSONDecoder
     private let encoder: JSONEncoder
     private let loadFromDiskState: BehaviorRelay<LoadFromDiskState> = .init(value: .none)
