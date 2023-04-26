@@ -38,8 +38,6 @@ final class ObjectOnDisk_Tests: XCTestCase {
         testSaveThenLoadThenDelete(objects: [TestEnum.two])
         testSaveThenLoadThenDelete(objects: [TestEnum.one, .two])
     }
-    
-    private let disposeBag = DisposeBag()
 }
 
 private extension ObjectOnDisk_Tests {
@@ -64,20 +62,23 @@ private extension ObjectOnDisk_Tests {
     }
     
     func testSaveThenLoadThenDelete<T: ObjectOnDiskWrappedRequirements>(objects: [T], file: StaticString = #filePath, line: UInt = #line) {
-        let objectOnDiskExpectation = XCTestExpectation(description: "ObjectOnDisk should never finished creating.")
+        let objectOnDiskExpectation = XCTestExpectation(description: "ObjectOnDisk should finished creating.")
+        let finishedStepsExpectation = XCTestExpectation(description: "Should finished steps.")
         createObjectOnDisk { [weak self] objectOnDisk in
-            self?.testSaveThenLoadThenDelete(objectOnDisk: objectOnDisk, steps: Self.steps(for: objects))
             objectOnDiskExpectation.fulfill()
+            self?.testSaveThenLoadThenDelete(objectOnDisk: objectOnDisk, steps: Array(Self.steps(for: objects).reversed()), completion: {
+                finishedStepsExpectation.fulfill()
+            }, file: file, line: line)
         }
-        wait(for: [objectOnDiskExpectation], timeout: 10)
+        wait(for: [objectOnDiskExpectation, finishedStepsExpectation], timeout: 0.1)
     }
     
-    func testSaveThenLoadThenDelete<T: ObjectOnDiskWrappedRequirements>(objectOnDisk: ObjectOnDisk<T>, steps: [Step<T>], file: StaticString = #filePath, line: UInt = #line) {
-        var steps = Array(steps.reversed())
+    func testSaveThenLoadThenDelete<T: ObjectOnDiskWrappedRequirements>(objectOnDisk: ObjectOnDisk<T>, steps: [Step<T>], completion: @escaping () -> Void, file: StaticString = #filePath, line: UInt = #line) {
+        var steps = steps
         
         let objectDidChange: (T?) -> Void = { obj in
             guard let nextStep = steps.popLast() else {
-                XCTAssert(false, "object did change, but no more steps left")
+                XCTAssert(false, "object did change, but no more steps left", file: file, line: line)
                 return
             }
             
@@ -89,17 +90,48 @@ private extension ObjectOnDisk_Tests {
             XCTAssert(stepObj == obj, "object did change to: \(String(describing: obj))\nbut we expected: \(String(describing: stepObj))", file: file, line: line)
         }
         
+        let disposeBag = DisposeBag()
+        var disposeBagPointer: DisposeBag? = disposeBag
+        
         objectOnDisk.object
             .subscribe(onNext: { objectDidChange($0) })
-            .disposed(by: disposeBag)
+            .disposed(by: disposeBagPointer ?? disposeBag)
         
-        while let nextStep = steps.popLast() {
-            guard case let .updateObject(obj) = nextStep else {
-                XCTAssert(false, "next step should be `updateObject`, instead was \(nextStep)", file: file, line: line)
+        update(
+            objectOnDisk: objectOnDisk,
+            nextObject: {
+                guard let nextStep = steps.popLast() else {
+                    return nil
+                }
+                
+                guard case let .updateObject(obj) = nextStep else {
+                    XCTAssert(false, "next step should be `updateObject`, instead was \(nextStep)", file: file, line: line)
+                    return nil
+                }
+                
+                return obj
+            },
+            completion: {
+                disposeBagPointer = nil
+                completion()
+            }
+        )
+    }
+    
+    func update<T: ObjectOnDiskWrappedRequirements>(objectOnDisk: ObjectOnDisk<T>, nextObject: @escaping () -> (T??), completion: @escaping () -> Void) {
+        guard let obj = nextObject() else {
+            completion()
+            return
+        }
+        
+        objectOnDisk.update(object: obj) { [weak self] success in
+            guard let base = self else {
+                assertionFailure("test died before it finished.")
+                completion()
                 return
             }
             
-            objectOnDisk.updateObject.onNext(obj)
+            base.update(objectOnDisk: objectOnDisk, nextObject: nextObject, completion: completion)
         }
     }
     

@@ -7,7 +7,9 @@
 
 import Foundation
 
-extension DiskInfo {
+public extension DiskInfo {
+    typealias SaveCompletionClosure = (Bool) -> Void
+    typealias SaveCompletion = SaveCompletionClosure?
     func saveInBackground<T: Encodable>(_ value: T?, encoder: JSONEncoder = .init(), completion: SaveCompletion = nil) throws {
         let completionOnMain: SaveCompletion = {
             guard let completion = completion else { return nil }

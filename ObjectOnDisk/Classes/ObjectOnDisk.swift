@@ -13,7 +13,6 @@ import RxRelay_PropertyWrappers
 import RxSwift
 
 public final class ObjectOnDisk<Wrapped: ObjectOnDiskWrappedRequirements> {
-    @PublishRelayObserverProperty public var updateObject: AnyObserver<Wrapped?>
     @PublishRelayObservableProperty public var didFinishDiskSave: Observable<DidFinishDiskSaveResult>
     @OptionalBehaviorRelayObservableProperty public var object: Observable<Wrapped?>
     
@@ -25,8 +24,6 @@ public final class ObjectOnDisk<Wrapped: ObjectOnDiskWrappedRequirements> {
         self.diskInfo = diskInfo
         self.decoder = decoder
         self.encoder = encoder
-        
-        setupObservations()
     }
     
     private let diskInfo: DiskInfo
@@ -82,6 +79,20 @@ public extension ObjectOnDisk {
         
         loadFromDisk(success: { final(.success($0)) }, failure: { final(.failure($0)) })
     }
+    
+    func update(object: Wrapped?, completion: DiskInfo.SaveCompletion = nil) {
+        guard loadFromDiskState.value == .finished else {
+            assertionFailure("loadFromDiskState.value should be .finished, instead was \(loadFromDiskState.value)")
+            completion?(false)
+            return
+        }
+        
+        _object.onNext(object)
+        
+        saveToDisk(object, completion: completion)
+    }
+    
+    var updateObject: Binder<Wrapped?> { .init(self, binding: { $0.update(object: $1) }) }
 }
 
 public extension ObjectOnDisk {
@@ -105,18 +116,6 @@ private extension ObjectOnDisk {
     typealias PrivateTypes = ObjectOnDiskPrivateTypes
     typealias LoadFromDiskState = PrivateTypes.LoadFromDiskState
     
-    func setupObservations() {
-        // Ignore attempts to update object until we've finished loading from disk.
-        _updateObject.asObservable()
-            .skip(until: loadFromDiskState.filter({ $0 == .finished }))
-            .distinctUntilChanged()
-            .bind(to:
-                    Binder(self, binding: { $0.saveToDisk($1) }).asObserver()
-                  , _object.asObserver()
-            )
-            .disposed(by: disposeBag)
-    }
-    
     func loadFromDisk(success: @escaping (Wrapped?) -> Void, failure: @escaping (Error) -> Void) {
         diskInfo.retrieveInBackground(decoder: decoder, success:success, failure: failure)
     }
@@ -136,33 +135,8 @@ private extension ObjectOnDisk {
         loadFromDiskState.accept(.finished)
     }
     
-    func saveToDisk(_ object: Wrapped?) {
-        guard loadFromDiskState.value == .finished else {
-            assertionFailure("loadFromDiskState.value should be .finished, instead was \(loadFromDiskState.value)")
-            return
-        }
-        
-        do {
-            try diskInfo.saveInBackground(object, encoder: encoder, completion: { [weak self] success in
-                assert(success, "Failed to load a objects from disk")
-#if DEBUG
-                self?.checkIsSavedToDisk(object)
-#endif
-                self?._didFinishDiskSave.onNext(.success(object))
-            })
-        } catch {
-            assertionFailure("Error saving object to disk: \(error)")
-            _didFinishDiskSave.onNext(.failure(error))
-        }
+    func saveToDisk(_ object: Wrapped?, completion: DiskInfo.SaveCompletion = nil) {
+        do { try diskInfo.saveInBackground(object, encoder: encoder, completion: completion) }
+        catch { completion?(false) }
     }
-    
-#if DEBUG
-    func checkIsSavedToDisk(_ object: Wrapped?) {
-        loadFromDisk(success: { new in
-            assert(object == new, " on disk should match")
-        }, failure: { error in
-            assertionFailure("Failed to load object from disk with error: \(error)")
-        })
-    }
-#endif
 }
