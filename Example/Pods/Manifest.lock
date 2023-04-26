@@ -31,7 +31,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Disk: dcee5c2e98fb72f9a924cde8da8435b08244a80e
-  ObjectOnDisk: 6982c8d59bacf5db08dfe5581ed3d004124ddb91
+  ObjectOnDisk: 7226ea102df4b8b407b546cc9748a1091d9f0227
   RxCocoa: 94f817b71c07517321eb4f9ad299112ca8af743b
   RxRelay: 1de1523e604c72b6c68feadedd1af3b1b4d0ecbd
   RxRelay-PropertyWrappers: 6b3ecaf956c2dffd4d23743c3986d078ac60dbbc
