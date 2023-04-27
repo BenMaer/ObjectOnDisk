@@ -45,6 +45,6 @@ Pod::Spec.new do |s|
   # s.frameworks = 'UIKit', 'MapKit'
   s.dependency 'Disk', '~> 0.6.4'
   s.dependency 'RxCocoa', '~> 6.5.0'
-  s.dependency 'RxRelay-PropertyWrappers', '~> 0.1.1'
+  s.dependency 'RxRelay-PropertyWrappers', '~> 0.2.0'
   s.dependency 'RxRelay', '~> 6.5.0'
 end
