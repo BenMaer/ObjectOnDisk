@@ -10,5 +10,5 @@ import Foundation
 import RxRelay
 
 extension BehaviorRelay {
-    convenience init<T>() where Element == T? { self.init(value: nil) }
+    public convenience init<T>() where Element == T? { self.init(value: nil) }
 }
