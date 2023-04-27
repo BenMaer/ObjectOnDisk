@@ -10,5 +10,5 @@ import Foundation
 import RxRelay
 
 extension PublishRelay: RxRelayType, RelayPropertyType, HasBlankInit {}
-public typealias PublishRelayObservableProperty<Element> = RelayObservableProperty<PublishRelay<Element>>
 public typealias PublishRelayObserverProperty<Element> = RelayObserverProperty<PublishRelay<Element>>
+public typealias PublishRelayObservableProperty<Element> = RelayObservableProperty<PublishRelay<Element>>
