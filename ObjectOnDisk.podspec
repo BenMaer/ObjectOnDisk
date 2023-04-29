@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'ObjectOnDisk'
-  s.version          = '0.1.1'
+  s.version          = '0.2.0'
   s.summary          = 'Helps managing saving/loading an object to/from disk.'
 
 # This description is used to generate tags and improve search results.
