@@ -14,7 +14,6 @@ import RxSwift
 
 public final class ObjectOnDisk<Wrapped: ObjectOnDiskWrappedRequirements> {
     let diskInfo: DiskInfo
-    @PublishRelayObservableProperty public var didFinishDiskSave: Observable<DidFinishDiskSaveResult>
     @OptionalBehaviorRelayObservableProperty public var object: Observable<Wrapped?>
     
     public init(
@@ -40,7 +39,6 @@ public final class ObjectOnDisk<Wrapped: ObjectOnDiskWrappedRequirements> {
 public typealias ObjectOnDiskWrappedRequirements = Codable & Equatable
 
 public extension ObjectOnDisk {
-    typealias DidFinishDiskSaveResult = Result<Wrapped?,Error>
     typealias Configuration = ObjectOnDiskConfiguration
     
     static var configuration: Configuration { .shared }
@@ -80,11 +78,10 @@ public extension ObjectOnDisk {
         loadFromDisk(success: { final(.success($0)) }, failure: { final(.failure($0)) })
     }
     
-    func update(object: Wrapped?, completion: DiskInfo.SaveCompletion = nil) {
+    func update(object: Wrapped?, completion: DiskInfo.SaveCompletion = nil) throws {
         guard loadFromDiskState.value == .finished else {
-            assertionFailure("loadFromDiskState.value should be .finished, instead was \(loadFromDiskState.value)")
             completion?(false)
-            return
+            throw ObjectOnDiskError.UpdateObject.stillLoadingFromDisk
         }
         
         _object.onNext(object)
@@ -92,7 +89,7 @@ public extension ObjectOnDisk {
         saveToDisk(object, completion: completion)
     }
     
-    var updateObject: Binder<Wrapped?> { .init(self, binding: { $0.update(object: $1) }) }
+    var updateObject: Binder<Wrapped?> { .init(self, binding: { try? $0.update(object: $1) }) }
 }
 
 public extension ObjectOnDisk {
@@ -138,5 +135,11 @@ private extension ObjectOnDisk {
     func saveToDisk(_ object: Wrapped?, completion: DiskInfo.SaveCompletion = nil) {
         do { try diskInfo.saveInBackground(object, encoder: encoder, completion: completion) }
         catch { completion?(false) }
+    }
+}
+
+public enum ObjectOnDiskError {
+    public enum UpdateObject: Error {
+        case stillLoadingFromDisk
     }
 }

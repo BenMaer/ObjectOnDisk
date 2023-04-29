@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension DiskInfo {
+public extension DiskInfo {
     func retrieveInBackground<T: Decodable>(as type: T.Type = T.self, decoder: JSONDecoder = .init(), success: @escaping RetrieveSuccess<T>, failure: RetrieveFailure = nil) {
         Self.backgroundQueue.async {
             let retrievedResult = retrieveResult(as: T.self, decoder: decoder)

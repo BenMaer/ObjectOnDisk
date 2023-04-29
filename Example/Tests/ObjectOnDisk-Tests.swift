@@ -38,6 +38,30 @@ final class ObjectOnDisk_Tests: XCTestCase {
         testSaveThenLoadThenDelete(objects: [TestEnum.two])
         testSaveThenLoadThenDelete(objects: [TestEnum.one, .two])
     }
+    
+    func testLoadsPreviousSave() {
+        struct TestStruct: ObjectOnDiskWrappedRequirements {
+            let int: Int
+        }
+        
+        let expectation = XCTestExpectation(description: "Load previous save")
+        let test = TestStruct(int: Int.random(in: (Int.min...Int.max)))
+        let diskInfo = DiskInfo(directory: .temporary, path: "testLoadsPreviousSave.data")
+        try? diskInfo.remove()
+        Self.createObjectOnDisk(diskInfo: diskInfo) { objectOnDisk in
+            Self.update(objectOnDisk: objectOnDisk, object: test) {
+                Self.createObjectOnDisk(diskInfo: DiskInfo(directory: .temporary, path: "testLoadsPreviousSave.data")) { objectOnDisk in
+                    Self.test(
+                        objectOnDisk: objectOnDisk,
+                        steps: [.objectDidChange(test)],
+                        completion: { expectation.fulfill() }
+                    )
+                }
+            }
+        }
+        
+        wait(for: [expectation], timeout: 0.1)
+    }
 }
 
 private extension ObjectOnDisk_Tests {
@@ -49,7 +73,7 @@ private extension ObjectOnDisk_Tests {
     class TestClass: ObjectOnDiskWrappedRequirements {
         let int: Int
         init(int: Int) { self.int = int }
-        static func == (lhs: TestClass, rhs: TestClass) -> Bool { lhs.int == rhs.int}
+        static func == (lhs: TestClass, rhs: TestClass) -> Bool { lhs.int == rhs.int }
     }
     
     func testSaveThenLoadThenDelete<T: ObjectOnDiskWrappedRequirements>(objects: [T], file: StaticString = #filePath, line: UInt = #line) {
@@ -64,18 +88,24 @@ private extension ObjectOnDisk_Tests {
         wait(for: [objectOnDiskExpectation, finishedStepsExpectation], timeout: 0.1)
     }
     
-    static func createObjectOnDisk<T: ObjectOnDiskWrappedRequirements>(_ completion: @escaping (ObjectOnDisk<T>) -> Void) {
-        let diskInfo = DiskInfo(path: "unit-test-path")
-        try? diskInfo.remove()
+    static func createObjectOnDisk<T: ObjectOnDiskWrappedRequirements>(diskInfo: DiskInfo? = nil, _ completion: @escaping (ObjectOnDisk<T>) -> Void) {
+        let diskInfo: DiskInfo = diskInfo ?? {
+            let diskInfo = DiskInfo(directory: .temporary, path: "ObjectOnDisk_Tests-object.data")
+            // If not specifying a disk info, then a fresh one should be blank.
+            try? diskInfo.remove()
+            return diskInfo
+        }()
         
         let objectOnDisk = ObjectOnDisk<T>.init(diskInfo: diskInfo)
         objectOnDisk.loadFromDisk(completion: { completion(objectOnDisk) })
-        
     }
     
     static func testSaveThenLoadThenDelete<T: ObjectOnDiskWrappedRequirements>(objectOnDisk: ObjectOnDisk<T>, objects: [T], completion: @escaping () -> Void, file: StaticString = #filePath, line: UInt = #line) {
-        var steps = Array(Self.steps(for: objects).reversed())
-        
+        test(objectOnDisk: objectOnDisk, steps: Array(Self.steps(for: objects).reversed()), completion: completion, file: file, line: line)
+    }
+    
+    static func test<T: ObjectOnDiskWrappedRequirements>(objectOnDisk: ObjectOnDisk<T>, steps: [Step<T>], completion: @escaping () -> Void, file: StaticString = #filePath, line: UInt = #line) {
+        var steps = steps
         let objectDidChange: (T?) -> Void = { obj in
             guard let nextStep = steps.popLast() else {
                 XCTAssert(false, "object did change, but no more steps left", file: file, line: line)
@@ -109,30 +139,40 @@ private extension ObjectOnDisk_Tests {
                 }
                 
                 return obj
-            }, completion: {
+            },
+            file: file, line: line, completion: {
                 disposeBagPointer = nil
                 completion()
-            },
-            file: file, line: line
+            }
         )
     }
     
-    static func update<T: ObjectOnDiskWrappedRequirements>(objectOnDisk: ObjectOnDisk<T>, nextObject: @escaping () -> (T??), completion: @escaping () -> Void, file: StaticString = #filePath, line: UInt = #line) {
+    static func update<T: ObjectOnDiskWrappedRequirements>(objectOnDisk: ObjectOnDisk<T>, nextObject: @escaping () -> (T??), file: StaticString = #filePath, line: UInt = #line, completion: @escaping () -> Void) {
         guard let obj = nextObject() else {
             completion()
             return
         }
         
-        objectOnDisk.update(object: obj) { success in
-            guard success else {
-                XCTAssert(false, "failed to save object: \(String(describing: obj)): to disk info: \(objectOnDisk.diskInfo)", file: file, line: line)
+        update(objectOnDisk: objectOnDisk, object: obj, file: file, line: line) {
+            Self.update(objectOnDisk: objectOnDisk, nextObject: nextObject, file: file, line: line, completion: completion)
+        }
+    }
+    
+    static func update<T: ObjectOnDiskWrappedRequirements>(objectOnDisk: ObjectOnDisk<T>, object: T?, file: StaticString = #filePath, line: UInt = #line, completion: @escaping () -> Void) {
+        do {
+            try objectOnDisk.update(object: object) { success in
+                guard success else {
+                    XCTAssert(false, "failed to save object: \(String(describing: object)): to disk info: \(objectOnDisk.diskInfo)", file: file, line: line)
+                    completion()
+                    return
+                }
+                
+                checkObjectIsSavedToDisk(object, diskInfo: objectOnDisk.diskInfo, file: file, line: line)
+                
                 completion()
-                return
             }
-            
-            checkObjectIsSavedToDisk(obj, diskInfo: objectOnDisk.diskInfo, file: file, line: line)
-            
-            update(objectOnDisk: objectOnDisk, nextObject: nextObject, completion: completion, file: file, line: line)
+        } catch {
+            XCTAssert(false, "failed to update object with error: \(error)", file: file, line: line)
         }
     }
     
