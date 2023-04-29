@@ -1,6 +1,6 @@
 PODS:
   - Disk (0.6.4)
-  - ObjectOnDisk (0.1.1):
+  - ObjectOnDisk (0.2.0):
     - Disk (~> 0.6.4)
     - RxCocoa (~> 6.5.0)
     - RxRelay (~> 6.5.0)
@@ -31,7 +31,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Disk: dcee5c2e98fb72f9a924cde8da8435b08244a80e
-  ObjectOnDisk: 42e4537694fd76d9b8fcd5b89cb05d9a2e00fbfa
+  ObjectOnDisk: 05de96b4342ce161619effc732f8fa1aa812b5ca
   RxCocoa: 94f817b71c07517321eb4f9ad299112ca8af743b
   RxRelay: 1de1523e604c72b6c68feadedd1af3b1b4d0ecbd
   RxRelay-PropertyWrappers: ab33d101a73b1474c13dbf59255c45abcf43f45a
