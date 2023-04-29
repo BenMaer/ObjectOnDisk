@@ -6,9 +6,10 @@
 //
 
 import Foundation
+
 import Disk
 
-extension DiskInfo {
+public extension DiskInfo {
     var existsOnDisk: Bool {
         guard let url = try? Disk.url(for: path, in: directory) else { return false }
         return Disk.exists(url)

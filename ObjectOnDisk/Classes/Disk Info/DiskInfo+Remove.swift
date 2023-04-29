@@ -6,8 +6,9 @@
 //
 
 import Foundation
+
 import Disk
 
-extension DiskInfo {
+public extension DiskInfo {
     func remove() throws { try Disk.remove(path, from: directory) }
 }
