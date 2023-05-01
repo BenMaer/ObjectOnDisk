@@ -13,6 +13,7 @@
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
 		648C2384379644A1F25AFACE /* Pods_ObjectOnDisk_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50974D6F7C10D96BA5637155 /* Pods_ObjectOnDisk_Tests.framework */; };
+		D79FD8CB2A0033E1002CB640 /* XCTAssertFailure.swift in Sources */ = {isa = PBXBuildFile; fileRef = D79FD8CA2A0033E1002CB640 /* XCTAssertFailure.swift */; };
 		D7C8E34529F84E0C004F888E /* ObjectOnDisk-Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7C8E34429F84E0C004F888E /* ObjectOnDisk-Tests.swift */; };
 		E8F4BBD9F327E4A1DF721325 /* Pods_ObjectOnDisk_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B8C2BD2F318F864B7ECAC449 /* Pods_ObjectOnDisk_Example.framework */; };
 /* End PBXBuildFile section */
@@ -46,6 +47,7 @@
 		895DB11F1D5ED586D737F654 /* Pods-ObjectOnDisk_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ObjectOnDisk_Tests.release.xcconfig"; path = "Target Support Files/Pods-ObjectOnDisk_Tests/Pods-ObjectOnDisk_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		9D5CCD0DD9B7E29B3B8F66F7 /* Pods-ObjectOnDisk_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ObjectOnDisk_Example.debug.xcconfig"; path = "Target Support Files/Pods-ObjectOnDisk_Example/Pods-ObjectOnDisk_Example.debug.xcconfig"; sourceTree = "<group>"; };
 		B8C2BD2F318F864B7ECAC449 /* Pods_ObjectOnDisk_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ObjectOnDisk_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D79FD8CA2A0033E1002CB640 /* XCTAssertFailure.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XCTAssertFailure.swift; sourceTree = "<group>"; };
 		D7C8E34429F84E0C004F888E /* ObjectOnDisk-Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ObjectOnDisk-Tests.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -126,6 +128,7 @@
 		607FACE81AFB9204008FA782 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				D79FD8C82A0033CD002CB640 /* Source */,
 				D7C8E34429F84E0C004F888E /* ObjectOnDisk-Tests.swift */,
 				607FACE91AFB9204008FA782 /* Supporting Files */,
 			);
@@ -157,6 +160,22 @@
 				50974D6F7C10D96BA5637155 /* Pods_ObjectOnDisk_Tests.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		D79FD8C82A0033CD002CB640 /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				D79FD8C92A0033DC002CB640 /* XCTAssert */,
+			);
+			path = Source;
+			sourceTree = "<group>";
+		};
+		D79FD8C92A0033DC002CB640 /* XCTAssert */ = {
+			isa = PBXGroup;
+			children = (
+				D79FD8CA2A0033E1002CB640 /* XCTAssertFailure.swift */,
+			);
+			path = XCTAssert;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -350,6 +369,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D79FD8CB2A0033E1002CB640 /* XCTAssertFailure.swift in Sources */,
 				D7C8E34529F84E0C004F888E /* ObjectOnDisk-Tests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

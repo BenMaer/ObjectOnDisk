@@ -39,6 +39,39 @@ final class ObjectOnDisk_Tests: XCTestCase {
         testSaveThenLoadThenDelete(objects: [TestEnum.one, .two])
     }
     
+    func testIgnoreUpdateBeforeLoadFromDiskFinishes() {
+        struct TestStruct: ObjectOnDiskWrappedRequirements {}
+        
+        let diskInfo = DiskInfo(directory: .temporary, path: "testIgnoreUpdateBeforeLoadFromDiskFinishes.data")
+        try? diskInfo.remove()
+        
+        let objectOnDisk = ObjectOnDisk<TestStruct>(diskInfo: diskInfo)
+        
+        let disposeBag = DisposeBag()
+        var objectDidFire = false
+        
+        objectOnDisk.object
+            .subscribe(onNext: { object in
+                guard objectDidFire == false else {
+                    XCTAssertFailure("should only fire once.")
+                    return
+                }
+                objectDidFire = true
+                
+                XCTAssert(object == nil, "initial object should be nil.")
+            })
+            .disposed(by: disposeBag)
+        
+        XCTAssert(objectDidFire, "should have fired on subscription.")
+        
+        do {
+            try objectOnDisk.update(object: TestStruct())
+            XCTAssertFailure("Update neighborhood should have thrown error, since we haven't loaded from disk.")
+        } catch {
+            XCTAssert((error as? ObjectOnDiskError.UpdateObject) == .stillLoadingFromDisk, "Should have thrown error `ObjectOnDiskError.UpdateObject.stillLoadingFromDisk`, instead got: \(error)")
+        }
+    }
+    
     func testLoadsPreviousSave() {
         struct TestStruct: ObjectOnDiskWrappedRequirements {
             let int: Int
@@ -50,7 +83,7 @@ final class ObjectOnDisk_Tests: XCTestCase {
         try? diskInfo.remove()
         Self.createObjectOnDisk(diskInfo: diskInfo) { objectOnDisk in
             Self.update(objectOnDisk: objectOnDisk, object: test) {
-                Self.createObjectOnDisk(diskInfo: DiskInfo(directory: .temporary, path: "testLoadsPreviousSave.data")) { objectOnDisk in
+                Self.createObjectOnDisk(diskInfo: diskInfo) { objectOnDisk in
                     Self.test(
                         objectOnDisk: objectOnDisk,
                         steps: [.objectDidChange(test)],
@@ -108,12 +141,12 @@ private extension ObjectOnDisk_Tests {
         var steps = steps
         let objectDidChange: (T?) -> Void = { obj in
             guard let nextStep = steps.popLast() else {
-                XCTAssert(false, "object did change, but no more steps left", file: file, line: line)
+                XCTAssertFailure("object did change, but no more steps left", file: file, line: line)
                 return
             }
             
             guard case let .objectDidChange(stepObj) = nextStep else {
-                XCTAssert(false, "next step should be `objectDidChange`, instead was \(nextStep)", file: file, line: line)
+                XCTAssertFailure("next step should be `objectDidChange`, instead was \(nextStep)", file: file, line: line)
                 return
             }
             
@@ -134,7 +167,7 @@ private extension ObjectOnDisk_Tests {
                 }
                 
                 guard case let .updateObject(obj) = nextStep else {
-                    XCTAssert(false, "next step should be `updateObject`, instead was \(nextStep)", file: file, line: line)
+                    XCTAssertFailure("next step should be `updateObject`, instead was \(nextStep)", file: file, line: line)
                     return nil
                 }
                 
@@ -162,7 +195,7 @@ private extension ObjectOnDisk_Tests {
         do {
             try objectOnDisk.update(object: object) { success in
                 guard success else {
-                    XCTAssert(false, "failed to save object: \(String(describing: object)): to disk info: \(objectOnDisk.diskInfo)", file: file, line: line)
+                    XCTAssertFailure("failed to save object: \(String(describing: object)): to disk info: \(objectOnDisk.diskInfo)", file: file, line: line)
                     completion()
                     return
                 }
@@ -172,7 +205,7 @@ private extension ObjectOnDisk_Tests {
                 completion()
             }
         } catch {
-            XCTAssert(false, "failed to update object with error: \(error)", file: file, line: line)
+            XCTAssertFailure("failed to update object with error: \(error)", file: file, line: line)
         }
     }
     
@@ -183,7 +216,7 @@ private extension ObjectOnDisk_Tests {
         }
         
         guard let savedObject = try? diskInfo.retrieve(as: T.self) else {
-            XCTAssert(false, "should have had saved object at disk info: \(diskInfo)", file: file, line: line)
+            XCTAssertFailure("should have had saved object at disk info: \(diskInfo)", file: file, line: line)
             return
         }
         
