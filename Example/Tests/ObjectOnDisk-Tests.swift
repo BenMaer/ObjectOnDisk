@@ -95,6 +95,25 @@ final class ObjectOnDisk_Tests: XCTestCase {
         
         wait(for: [expectation], timeout: 0.1)
     }
+    
+    func testLoadsNilFromDisk() {
+        struct TestStruct: ObjectOnDiskWrappedRequirements {}
+        
+        let expectation = XCTestExpectation(description: "Load nil from disk")
+        let diskInfo = DiskInfo(directory: .temporary, path: "testLoadsPreviousSave.data")
+        try? diskInfo.remove()
+        Self.createObjectOnDisk(diskInfo: diskInfo) { (objectOnDisk: ObjectOnDisk<TestStruct>) in
+            do {
+                let object = try Self.getObject(from: objectOnDisk)
+                XCTAssert(object == nil, "object loaded from disk should be nil")
+                expectation.fulfill()
+            } catch {
+                XCTAssertFailure("failed to get object")
+            }
+        }
+        
+        wait(for: [expectation], timeout: 0.1)
+    }
 }
 
 private extension ObjectOnDisk_Tests {
@@ -107,6 +126,10 @@ private extension ObjectOnDisk_Tests {
         let int: Int
         init(int: Int) { self.int = int }
         static func == (lhs: TestClass, rhs: TestClass) -> Bool { lhs.int == rhs.int }
+    }
+    
+    enum GetObjectError: Error {
+        case eventDidNotFire
     }
     
     func testSaveThenLoadThenDelete<T: ObjectOnDiskWrappedRequirements>(objects: [T], file: StaticString = #filePath, line: UInt = #line) {
@@ -241,5 +264,28 @@ private extension ObjectOnDisk_Tests {
             
             objectSteps
         ].flatMap({ $0 })
+    }
+    
+    static func getObject<T: ObjectOnDiskWrappedRequirements>(from objectOnDisk: ObjectOnDisk<T>, file: StaticString = #filePath, line: UInt = #line) throws -> T? {
+        let disposeBag = DisposeBag()
+        var object: T?? = nil
+        
+        objectOnDisk.object
+            .subscribe(onNext: { o in
+                guard object == nil else {
+                    XCTAssertFailure("should only fire once.", file: file, line: line)
+                    return
+                }
+                
+                object = o
+            })
+            .disposed(by: disposeBag)
+        
+        guard let object = object else {
+            XCTAssertFailure("should have fired on subscription.", file: file, line: line)
+            throw GetObjectError.eventDidNotFire
+        }
+        
+        return object
     }
 }
