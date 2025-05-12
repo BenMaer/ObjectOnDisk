@@ -44,7 +44,7 @@ Pod::Spec.new do |s|
   # s.public_header_files = 'Pod/Classes/**/*.h'
   # s.frameworks = 'UIKit', 'MapKit'
   s.dependency 'Disk', '~> 0.6.4'
-  s.dependency 'RxCocoa', '~> 6.9.0'
-  s.dependency 'RxRelay-PropertyWrappers', :git => 'https://github.com/BenMaer/RxRelay-PropertyWrappers.git', :commit => '3743cc7135ed19b8b6ac9b24b989844ddbe42b0c'
-  s.dependency 'RxRelay', '~> 6.9.0'
+  s.dependency 'RxCocoa', '~> 6.5'
+  s.dependency 'RxRelay-PropertyWrappers', '0.2.2'
+  s.dependency 'RxRelay', '~> 6.5'
 end
