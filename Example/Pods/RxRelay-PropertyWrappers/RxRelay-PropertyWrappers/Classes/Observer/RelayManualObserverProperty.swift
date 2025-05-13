@@ -14,6 +14,9 @@ public struct RelayManualObserverProperty<Relay: RelayPropertyType> {
     public typealias Element = Relay.Element
     public let relay: Relay
     public var wrappedValue: AnyObserver<Element> { relay.asObserver() }
+    public init(relay: Relay) {
+        self.relay = relay
+    }
 }
 
 extension RelayManualObserverProperty: ObservableType {

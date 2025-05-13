@@ -1,18 +1,18 @@
 PODS:
   - Disk (0.6.4)
-  - ObjectOnDisk (0.2.0):
+  - ObjectOnDisk (0.2.1):
     - Disk (~> 0.6.4)
-    - RxCocoa (~> 6.5.0)
-    - RxRelay (~> 6.5.0)
-    - RxRelay-PropertyWrappers (~> 0.2.0)
-  - RxCocoa (6.5.0):
-    - RxRelay (= 6.5.0)
-    - RxSwift (= 6.5.0)
-  - RxRelay (6.5.0):
-    - RxSwift (= 6.5.0)
-  - RxRelay-PropertyWrappers (0.2.0):
-    - RxRelay (= 6.5.0)
-  - RxSwift (6.5.0)
+    - RxCocoa (~> 6.5)
+    - RxRelay (~> 6.5)
+    - RxRelay-PropertyWrappers (~> 0.2.1)
+  - RxCocoa (6.9.0):
+    - RxRelay (= 6.9.0)
+    - RxSwift (= 6.9.0)
+  - RxRelay (6.9.0):
+    - RxSwift (= 6.9.0)
+  - RxRelay-PropertyWrappers (0.2.2):
+    - RxRelay (~> 6.5)
+  - RxSwift (6.9.0)
 
 DEPENDENCIES:
   - ObjectOnDisk (from `../`)
@@ -31,12 +31,12 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Disk: dcee5c2e98fb72f9a924cde8da8435b08244a80e
-  ObjectOnDisk: 05de96b4342ce161619effc732f8fa1aa812b5ca
-  RxCocoa: 94f817b71c07517321eb4f9ad299112ca8af743b
-  RxRelay: 1de1523e604c72b6c68feadedd1af3b1b4d0ecbd
-  RxRelay-PropertyWrappers: ab33d101a73b1474c13dbf59255c45abcf43f45a
-  RxSwift: 5710a9e6b17f3c3d6e40d6e559b9fa1e813b2ef8
+  ObjectOnDisk: 7cbc26a853a671f63d7c98c3a27e46a45cbebcb3
+  RxCocoa: ac16414696ae706516be3e1ab00fcce5bdc9be8a
+  RxRelay: 6b0c930e5cef57d5fe2032571e5e65b78e3cbdb1
+  RxRelay-PropertyWrappers: 1be8a4c0b9271ac3997aa9c7ff083a1e64f1189e
+  RxSwift: 31649ace6aceeb422e16ff71c60804f9c3281ed9
 
 PODFILE CHECKSUM: 726b75731236b6a3cbe61a5f364c91a487838ed4
 
-COCOAPODS: 1.12.1
+COCOAPODS: 1.16.2
