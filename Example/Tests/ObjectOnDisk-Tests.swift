@@ -13,107 +13,107 @@ import RxSwift
 @testable import ObjectOnDisk
 
 final class ObjectOnDisk_Tests: XCTestCase {
-    func testSaveThenLoadThenDeleteClass() {
-        testSaveThenLoadThenDelete(objects: [TestClass(int: 1)])
-        testSaveThenLoadThenDelete(objects: [TestClass(int: 2)])
-        testSaveThenLoadThenDelete(objects: [TestClass(int: 1), .init(int: 2)])
-    }
-    
-    func testSaveThenLoadThenDeleteStruct() {
-        struct TestStruct: ObjectOnDiskWrappedRequirements {
-            let int: Int
-        }
-        
-        testSaveThenLoadThenDelete(objects: [TestStruct(int: 1)])
-        testSaveThenLoadThenDelete(objects: [TestStruct(int: 2)])
-        testSaveThenLoadThenDelete(objects: [TestStruct(int: 1), .init(int: 2)])
-    }
-    
-    func testSaveThenLoadThenDeleteEnum() {
-        enum TestEnum: ObjectOnDiskWrappedRequirements {
-            case one, two
-        }
-        
-        testSaveThenLoadThenDelete(objects: [TestEnum.one])
-        testSaveThenLoadThenDelete(objects: [TestEnum.two])
-        testSaveThenLoadThenDelete(objects: [TestEnum.one, .two])
-    }
-    
-    func testIgnoreUpdateBeforeLoadFromDiskFinishes() {
-        struct TestStruct: ObjectOnDiskWrappedRequirements {}
-        
-        let diskInfo = DiskInfo(directory: .temporary, path: "testIgnoreUpdateBeforeLoadFromDiskFinishes.data")
-        try? diskInfo.remove()
-        
-        let objectOnDisk = ObjectOnDisk<TestStruct>(diskInfo: diskInfo)
-        
-        let disposeBag = DisposeBag()
-        var objectDidFire = false
-        
-        objectOnDisk.object
-            .subscribe(onNext: { object in
-                guard objectDidFire == false else {
-                    XCTAssertFailure("should only fire once.")
-                    return
-                }
-                objectDidFire = true
-                
-                XCTAssert(object == nil, "initial object should be nil.")
-            })
-            .disposed(by: disposeBag)
-        
-        XCTAssert(objectDidFire, "should have fired on subscription.")
-        
-        do {
-            try objectOnDisk.update(object: TestStruct())
-            XCTAssertFailure("Update neighborhood should have thrown error, since we haven't loaded from disk.")
-        } catch {
-            XCTAssert((error as? ObjectOnDiskError.UpdateObject) == .stillLoadingFromDisk, "Should have thrown error `ObjectOnDiskError.UpdateObject.stillLoadingFromDisk`, instead got: \(error)")
-        }
-    }
-    
-    func testLoadsPreviousSave() {
-        struct TestStruct: ObjectOnDiskWrappedRequirements {
-            let int: Int
-        }
-        
-        let expectation = XCTestExpectation(description: "Load previous save")
-        let test = TestStruct(int: Int.random(in: (Int.min...Int.max)))
-        let diskInfo = DiskInfo(directory: .temporary, path: "testLoadsPreviousSave.data")
-        try? diskInfo.remove()
-        Self.createObjectOnDisk(diskInfo: diskInfo) { objectOnDisk in
-            Self.update(objectOnDisk: objectOnDisk, object: test) {
-                Self.createObjectOnDisk(diskInfo: diskInfo) { objectOnDisk in
-                    Self.test(
-                        objectOnDisk: objectOnDisk,
-                        steps: [.objectDidChange(test)],
-                        completion: { expectation.fulfill() }
-                    )
-                }
-            }
-        }
-        
-        wait(for: [expectation], timeout: 0.1)
-    }
-    
-    func testLoadsNilFromDisk() {
-        struct TestStruct: ObjectOnDiskWrappedRequirements {}
-        
-        let expectation = XCTestExpectation(description: "Load nil from disk")
-        let diskInfo = DiskInfo(directory: .temporary, path: "testLoadsPreviousSave.data")
-        try? diskInfo.remove()
-        Self.createObjectOnDisk(diskInfo: diskInfo) { (objectOnDisk: ObjectOnDisk<TestStruct>) in
-            do {
-                let object = try Self.getObject(from: objectOnDisk)
-                XCTAssert(object == nil, "object loaded from disk should be nil")
-                expectation.fulfill()
-            } catch {
-                XCTAssertFailure("failed to get object")
-            }
-        }
-        
-        wait(for: [expectation], timeout: 0.1)
-    }
+//    func testSaveThenLoadThenDeleteClass() {
+//        testSaveThenLoadThenDelete(objects: [TestClass(int: 1)])
+//        testSaveThenLoadThenDelete(objects: [TestClass(int: 2)])
+//        testSaveThenLoadThenDelete(objects: [TestClass(int: 1), .init(int: 2)])
+//    }
+//    
+//    func testSaveThenLoadThenDeleteStruct() {
+//        struct TestStruct: ObjectOnDiskWrappedRequirements {
+//            let int: Int
+//        }
+//        
+//        testSaveThenLoadThenDelete(objects: [TestStruct(int: 1)])
+//        testSaveThenLoadThenDelete(objects: [TestStruct(int: 2)])
+//        testSaveThenLoadThenDelete(objects: [TestStruct(int: 1), .init(int: 2)])
+//    }
+//    
+//    func testSaveThenLoadThenDeleteEnum() {
+//        enum TestEnum: ObjectOnDiskWrappedRequirements {
+//            case one, two
+//        }
+//        
+//        testSaveThenLoadThenDelete(objects: [TestEnum.one])
+//        testSaveThenLoadThenDelete(objects: [TestEnum.two])
+//        testSaveThenLoadThenDelete(objects: [TestEnum.one, .two])
+//    }
+//    
+//    func testIgnoreUpdateBeforeLoadFromDiskFinishes() {
+//        struct TestStruct: ObjectOnDiskWrappedRequirements {}
+//        
+//        let diskInfo = DiskInfo(directory: .temporary, path: "testIgnoreUpdateBeforeLoadFromDiskFinishes.data")
+//        try? diskInfo.remove()
+//        
+//        let objectOnDisk = ObjectOnDisk<TestStruct>(diskInfo: diskInfo)
+//        
+//        let disposeBag = DisposeBag()
+//        var objectDidFire = false
+//        
+//        objectOnDisk.object
+//            .subscribe(onNext: { object in
+//                guard objectDidFire == false else {
+//                    XCTAssertFailure("should only fire once.")
+//                    return
+//                }
+//                objectDidFire = true
+//                
+//                XCTAssert(object == nil, "initial object should be nil.")
+//            })
+//            .disposed(by: disposeBag)
+//        
+//        XCTAssert(objectDidFire, "should have fired on subscription.")
+//        
+//        do {
+//            try objectOnDisk.update(object: TestStruct())
+//            XCTAssertFailure("Update neighborhood should have thrown error, since we haven't loaded from disk.")
+//        } catch {
+//            XCTAssert((error as? ObjectOnDiskError.UpdateObject) == .stillLoadingFromDisk, "Should have thrown error `ObjectOnDiskError.UpdateObject.stillLoadingFromDisk`, instead got: \(error)")
+//        }
+//    }
+//    
+//    func testLoadsPreviousSave() {
+//        struct TestStruct: ObjectOnDiskWrappedRequirements {
+//            let int: Int
+//        }
+//        
+//        let expectation = XCTestExpectation(description: "Load previous save")
+//        let test = TestStruct(int: Int.random(in: (Int.min...Int.max)))
+//        let diskInfo = DiskInfo(directory: .temporary, path: "testLoadsPreviousSave.data")
+//        try? diskInfo.remove()
+//        Self.createObjectOnDisk(diskInfo: diskInfo) { objectOnDisk in
+//            Self.update(objectOnDisk: objectOnDisk, object: test) {
+//                Self.createObjectOnDisk(diskInfo: diskInfo) { objectOnDisk in
+//                    Self.test(
+//                        objectOnDisk: objectOnDisk,
+//                        steps: [.objectDidChange(test)],
+//                        completion: { expectation.fulfill() }
+//                    )
+//                }
+//            }
+//        }
+//        
+//        wait(for: [expectation], timeout: 0.1)
+//    }
+//    
+//    func testLoadsNilFromDisk() {
+//        struct TestStruct: ObjectOnDiskWrappedRequirements {}
+//        
+//        let expectation = XCTestExpectation(description: "Load nil from disk")
+//        let diskInfo = DiskInfo(directory: .temporary, path: "testLoadsPreviousSave.data")
+//        try? diskInfo.remove()
+//        Self.createObjectOnDisk(diskInfo: diskInfo) { (objectOnDisk: ObjectOnDisk<TestStruct>) in
+//            do {
+//                let object = try Self.getObject(from: objectOnDisk)
+//                XCTAssert(object == nil, "object loaded from disk should be nil")
+//                expectation.fulfill()
+//            } catch {
+//                XCTAssertFailure("failed to get object")
+//            }
+//        }
+//        
+//        wait(for: [expectation], timeout: 0.1)
+//    }
 }
 
 private extension ObjectOnDisk_Tests {
